@@ -14,6 +14,14 @@ async function getAllUser() {
   return allUsers;
 }
 
+async function getUserById(userId) {
+  try {
+    return await users.findById(userId);
+  } catch (err) {
+    return err;
+  }
+}
+
 async function createNewUser(user) {
   const password = await hashPassword(user.password);
   try {
@@ -24,7 +32,28 @@ async function createNewUser(user) {
   }
 }
 
+async function updateUser(userId, updatedUserCred) {
+  try {
+    const user = await users.findByIdAndUpdate(userId, updatedUserCred);
+    if (user) {
+      const updatedUser = await getUserById(userId);
+      return updatedUser;
+    }
+  } catch (err) {
+    console.log(err.message);
+  }
+}
+
+async function deleteUser(userId) {
+  const deletedUser = users.findByIdAndDelete(userId);
+
+  return deletedUser;
+}
+
 module.exports = {
   getAllUser,
+  getUserById,
   createNewUser,
+  updateUser,
+  deleteUser,
 };
