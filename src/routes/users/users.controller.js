@@ -5,7 +5,6 @@ const {
   updateUser,
   deleteUser,
 } = require("../../models/users/users.model");
-const { hashPassword } = require("../../services/bcrypt");
 const validateUser = require("./users.validate");
 
 async function httpGetAllUser(req, res) {
@@ -15,7 +14,8 @@ async function httpGetAllUser(req, res) {
 }
 
 async function httpCreateNewUser(req, res) {
-  const password = String(req.body.password);
+  const { password } = req.body;
+
   const userCred = {
     ...req.body,
     password,
