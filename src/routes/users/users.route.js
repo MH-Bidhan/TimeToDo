@@ -12,10 +12,5 @@ userRouter.get("/", httpGetAllUser);
 userRouter.post("/", httpCreateNewUser);
 userRouter.put("/:id", httpUpdateUser);
 userRouter.delete("/:id", httpDeleteUser);
-// userRouter.put("/:id", (req, res) => {
-//   const { id } = req.params;
-
-//   res.send(id);
-// });
 
 module.exports = userRouter;
