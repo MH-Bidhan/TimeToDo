@@ -5,6 +5,7 @@ const {
   updateUser,
   deleteUser,
 } = require("../../models/users/users.model");
+const errorMessage = require("../../services/error-messages");
 const validateUser = require("./users.validate");
 
 async function httpGetAllUser(req, res) {
@@ -42,11 +43,7 @@ async function httpUpdateUser(req, res) {
   // console.log(user);
 
   if (!user) {
-    return res.status(404).json({
-      error: {
-        message: "No user found with the given id",
-      },
-    });
+    return res.status(404).json(errorMessage.userNotFound);
   }
 
   const {
@@ -87,11 +84,7 @@ async function httpDeleteUser(req, res) {
   const user = await getUserById(id);
 
   if (!user) {
-    return res.status(404).json({
-      error: {
-        message: "No user found with the given id",
-      },
-    });
+    return res.status(404).json(errorMessage.userNotFound);
   }
 
   const deletedUser = await deleteUser(id);

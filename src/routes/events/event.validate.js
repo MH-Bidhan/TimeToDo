@@ -9,6 +9,7 @@ const eventSchema = Joi.object({
   marked: Joi.boolean().required().default(false),
   completed: Joi.boolean().required().default(true),
   archived: Joi.boolean().required().default(false),
+  isImportant: Joi.boolean().required().default(false),
 });
 
 function validateEvent(event) {

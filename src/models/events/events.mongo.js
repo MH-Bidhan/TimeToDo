@@ -41,6 +41,11 @@ const eventSchema = mongoose.Schema({
     required: true,
     default: false,
   },
+  isImportant: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
 });
 
 module.exports = mongoose.model("event", eventSchema);

@@ -1,4 +1,6 @@
 const events = require("./events.mongo");
+const users = require("../users/users.mongo");
+const { updateUser } = require("../users/users.model");
 
 async function getUserEvents(userId) {
   const allEvents = await events.find({ userId });
@@ -6,9 +8,14 @@ async function getUserEvents(userId) {
   return allEvents;
 }
 
-async function createNewEvent(event) {
+async function createNewEvent(userId, event) {
   try {
     const newEvent = await events.create(event);
+
+    const user = await users.findById(userId);
+    user.remainingQuota -= 1;
+    await updateUser(userId, user);
+
     return newEvent;
   } catch (err) {
     console.log(err.message);

@@ -6,18 +6,21 @@ const {
 } = require("../../models/events/events.model");
 const events = require("../../models/events/events.mongo");
 const { getUserById } = require("../../models/users/users.model");
+const errorMessage = require("../../services/error-messages");
+const { checkEventStatus } = require("../../services/event-status");
 const validateEvent = require("./event.validate");
 
 async function httpGetAllEventsOfUser(req, res) {
+  // Sends a get request to the Server to get all events created by a specific user
   const { userId } = req.query;
 
   if (!userId) {
-    return res.status(400).json({
-      error: {
-        message: "No user has been specified",
-      },
-    });
+    return res.status(400).json(errorMessage.noUserSpecified);
   }
+
+  const userEventsForCheck = await getUserEvents(userId);
+
+  await checkEventStatus(userEventsForCheck);
 
   const userEvents = await getUserEvents(userId);
 
@@ -30,11 +33,7 @@ async function httpCreateNewEvent(req, res) {
   const currentTime = Date.now();
 
   if (currentTime > timeOfEvent) {
-    return res.status(400).json({
-      error: {
-        message: "Event time must be in the future",
-      },
-    });
+    return res.status(400).json(errorMessage.eventTimeError);
   }
 
   const newEvent = {
@@ -43,16 +42,17 @@ async function httpCreateNewEvent(req, res) {
     marked: false,
     completed: true,
     archived: false,
+    isImportant: false,
   };
 
   const user = await getUserById(userId);
 
   if (!user) {
-    return res.status(404).json({
-      error: {
-        message: "No user found with the given id",
-      },
-    });
+    return res.status(404).json(errorMessage.userNotFound);
+  }
+
+  if (user.remainingQuota === 0) {
+    return res.status(400).json(errorMessage.missingQuota);
   }
 
   const { error } = validateEvent(newEvent);
@@ -61,7 +61,7 @@ async function httpCreateNewEvent(req, res) {
     return res.status(400).json(error.message);
   }
 
-  const createdEvent = await createNewEvent(newEvent);
+  const createdEvent = await createNewEvent(userId, newEvent);
 
   return res.status(201).json(createdEvent);
 }
@@ -72,6 +72,10 @@ async function httpUpdateEvent(req, res) {
 
   const event = await events.findById(eventId);
 
+  if (!event) {
+    return res.status(404).json(errorMessage.userNotFound);
+  }
+
   const {
     userId,
     name,
@@ -81,6 +85,7 @@ async function httpUpdateEvent(req, res) {
     marked,
     completed,
     archived,
+    isImportant,
   } = event;
 
   const updatedEventCred = {
@@ -92,16 +97,9 @@ async function httpUpdateEvent(req, res) {
     marked,
     completed,
     archived,
+    isImportant,
     ...updateCred,
   };
-
-  if (!event) {
-    return res.status(400).json({
-      error: {
-        message: "No event found with the given id",
-      },
-    });
-  }
 
   const { error } = validateEvent(updatedEventCred);
 
@@ -120,11 +118,7 @@ async function httpDeleteEvent(req, res) {
   const event = await events.findById(eventId);
 
   if (!event) {
-    return res.status(400).json({
-      error: {
-        message: "No event found with the given id",
-      },
-    });
+    return res.status(400).json(errorMessage.userNotFound);
   }
 
   const deletedEvent = await deleteEvent(eventId);
