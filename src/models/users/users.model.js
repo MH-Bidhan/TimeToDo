@@ -58,6 +58,21 @@ async function deleteUser(userId) {
   return deletedUser;
 }
 
+async function changePassword(userId, newPassword) {
+  const user = users.findById(userId);
+
+  const password = await hashPassword(newPassword);
+
+  const updateCreds = {
+    ...user._doc,
+    password,
+  };
+
+  const updatedUser = await users.findByIdAndUpdate(userId, updateCreds);
+
+  return updatedUser;
+}
+
 module.exports = {
   getAllUser,
   getUserById,
@@ -65,4 +80,5 @@ module.exports = {
   createNewUser,
   updateUser,
   deleteUser,
+  changePassword,
 };

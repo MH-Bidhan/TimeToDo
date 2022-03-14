@@ -5,8 +5,9 @@ const {
   updateUser,
   deleteUser,
   getUserByEmail,
+  changePassword,
 } = require("../../models/users/users.model");
-const { hashPassword } = require("../../services/bcrypt");
+const { hashPassword, verifyPassword } = require("../../services/bcrypt");
 const errorMessage = require("../../services/error-messages");
 const validateUser = require("./users.validate");
 
@@ -19,7 +20,7 @@ async function httpGetAllUser(req, res) {
 async function httpCreateNewUser(req, res) {
   const { email } = req.body;
 
-  const user = getUserByEmail(email);
+  const user = await getUserByEmail(email);
   if (user) {
     return res.status(400).json(errorMessage.emailAlreadyInUse);
   }
@@ -101,9 +102,37 @@ async function httpDeleteUser(req, res) {
   return res.status(200).json(deletedUser);
 }
 
+async function httpChangePassword(req, res) {
+  const { oldPassword, newPassword, confirmPassword } = req.body;
+
+  const { id } = req.params;
+
+  const user = await getUserById(id);
+
+  if (!user) {
+    return res.status(400).json(errorMessage.userNotFound);
+  }
+
+  if (newPassword !== confirmPassword) {
+    return res
+      .status(400)
+      .json("New password and confirm password does not match");
+  }
+
+  const oldPasswordMatch = await verifyPassword(oldPassword, user.password);
+  if (!oldPasswordMatch) {
+    return res.status(400).json("Password is not valid");
+  }
+
+  const passwordChanged = await changePassword(id, newPassword);
+
+  res.status(200).json(passwordChanged);
+}
+
 module.exports = {
   httpGetAllUser,
   httpCreateNewUser,
   httpUpdateUser,
   httpDeleteUser,
+  httpChangePassword,
 };

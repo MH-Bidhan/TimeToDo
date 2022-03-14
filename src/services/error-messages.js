@@ -39,6 +39,11 @@ const errorMessage = {
       message: "This email is already in use",
     },
   },
+  accessDenied: {
+    error: {
+      message: "Access denied",
+    },
+  },
 };
 
 module.exports = errorMessage;

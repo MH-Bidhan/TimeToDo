@@ -8,11 +8,14 @@ const events = require("../../models/events/events.mongo");
 const { getUserById } = require("../../models/users/users.model");
 const errorMessage = require("../../services/error-messages");
 const { checkEventStatus } = require("../../services/event-status");
+const { verifyAuthToken } = require("../../services/jwt");
 const validateEvent = require("./event.validate");
 
 async function httpGetAllEventsOfUser(req, res) {
   // Sends a get request to the Server to get all events created by a specific user
-  const { userId } = req.query;
+  const token = req.header("x-auth-token");
+
+  const { id: userId } = verifyAuthToken(token);
 
   if (!userId) {
     return res.status(400).json(errorMessage.noUserSpecified);
@@ -28,7 +31,8 @@ async function httpGetAllEventsOfUser(req, res) {
 }
 
 async function httpCreateNewEvent(req, res) {
-  const { userId } = req.body;
+  const token = req.header("x-auth-token");
+  const { id: userId } = verifyAuthToken(token);
   const timeOfEvent = new Date(req.body.timeOfEvent);
   const currentTime = Date.now();
 
@@ -38,6 +42,7 @@ async function httpCreateNewEvent(req, res) {
 
   const newEvent = {
     ...req.body,
+    userId,
     upcoming: true,
     marked: false,
     completed: true,
@@ -67,6 +72,9 @@ async function httpCreateNewEvent(req, res) {
 }
 
 async function httpUpdateEvent(req, res) {
+  const token = req.header("x-auth-token");
+  const { id } = verifyAuthToken(token);
+
   const updateCred = req.body;
   const { eventId } = req.params;
 
@@ -87,6 +95,10 @@ async function httpUpdateEvent(req, res) {
     archived,
     isImportant,
   } = event;
+
+  if (userId !== id) {
+    return res.status(404).json(errorMessage.accessDenied);
+  }
 
   const updatedEventCred = {
     userId,
@@ -113,12 +125,20 @@ async function httpUpdateEvent(req, res) {
 }
 
 async function httpDeleteEvent(req, res) {
+  const token = req.header("x-auth-token");
+  const { id } = verifyAuthToken(token);
+
   const { eventId } = req.params;
 
   const event = await events.findById(eventId);
 
   if (!event) {
     return res.status(400).json(errorMessage.userNotFound);
+  }
+  const { userId } = event;
+
+  if (userId !== id) {
+    return res.status(404).json(errorMessage.accessDenied);
   }
 
   const deletedEvent = await deleteEvent(eventId);
