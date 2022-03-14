@@ -8,8 +8,8 @@ async function hashPassword(password) {
   return hashedPassword;
 }
 
-async function verifyPassword(password) {
-  const verifiedPassword = await bcrypt.compare(password);
+async function verifyPassword(password, hashedPassword) {
+  const verifiedPassword = await bcrypt.compare(password, hashedPassword);
 
   return verifiedPassword;
 }

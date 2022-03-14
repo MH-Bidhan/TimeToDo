@@ -19,6 +19,26 @@ const errorMessage = {
       message: "User does not possess enough quota to create an event ",
     },
   },
+  loginError: {
+    error: {
+      message: "Invalid email or password",
+    },
+  },
+  authError: {
+    error: {
+      message: "User must be authenticated",
+    },
+  },
+  passwordRequest: {
+    error: {
+      message: "Password change request must be sent separetly",
+    },
+  },
+  emailAlreadyInUse: {
+    error: {
+      message: "This email is already in use",
+    },
+  },
 };
 
 module.exports = errorMessage;

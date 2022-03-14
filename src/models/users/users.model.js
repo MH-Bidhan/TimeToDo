@@ -22,6 +22,14 @@ async function getUserById(userId) {
   }
 }
 
+async function getUserByEmail(email) {
+  try {
+    return await users.findOne({ email });
+  } catch (err) {
+    return err;
+  }
+}
+
 async function createNewUser(user) {
   const password = await hashPassword(user.password);
   try {
@@ -53,6 +61,7 @@ async function deleteUser(userId) {
 module.exports = {
   getAllUser,
   getUserById,
+  getUserByEmail,
   createNewUser,
   updateUser,
   deleteUser,

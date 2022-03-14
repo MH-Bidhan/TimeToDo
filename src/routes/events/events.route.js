@@ -1,4 +1,5 @@
 const express = require("express");
+const { checkAuth } = require("../../services/check-auth");
 const {
   httpGetAllEventsOfUser,
   httpCreateNewEvent,
@@ -8,9 +9,9 @@ const {
 
 const eventRouter = express.Router();
 
-eventRouter.get("/", httpGetAllEventsOfUser);
-eventRouter.post("/", httpCreateNewEvent);
-eventRouter.put("/:eventId", httpUpdateEvent);
-eventRouter.delete("/:eventId", httpDeleteEvent);
+eventRouter.get("/", checkAuth, httpGetAllEventsOfUser);
+eventRouter.post("/", checkAuth, httpCreateNewEvent);
+eventRouter.put("/:eventId", checkAuth, httpUpdateEvent);
+eventRouter.delete("/:eventId", checkAuth, httpDeleteEvent);
 
 module.exports = eventRouter;

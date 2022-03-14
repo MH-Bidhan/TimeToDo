@@ -1,4 +1,5 @@
 const express = require("express");
+const { checkAuth } = require("../../services/check-auth");
 const {
   httpGetAllUser,
   httpCreateNewUser,
@@ -10,7 +11,7 @@ const userRouter = express.Router();
 
 userRouter.get("/", httpGetAllUser);
 userRouter.post("/", httpCreateNewUser);
-userRouter.put("/:id", httpUpdateUser);
-userRouter.delete("/:id", httpDeleteUser);
+userRouter.put("/:id", checkAuth, httpUpdateUser);
+userRouter.delete("/:id", checkAuth, httpDeleteUser);
 
 module.exports = userRouter;

@@ -4,7 +4,9 @@ const {
   getUserById,
   updateUser,
   deleteUser,
+  getUserByEmail,
 } = require("../../models/users/users.model");
+const { hashPassword } = require("../../services/bcrypt");
 const errorMessage = require("../../services/error-messages");
 const validateUser = require("./users.validate");
 
@@ -15,11 +17,15 @@ async function httpGetAllUser(req, res) {
 }
 
 async function httpCreateNewUser(req, res) {
-  const { password } = req.body;
+  const { email } = req.body;
+
+  const user = getUserByEmail(email);
+  if (user) {
+    return res.status(400).json(errorMessage.emailAlreadyInUse);
+  }
 
   const userCred = {
     ...req.body,
-    password,
     isGold: false,
     createdAt: Date.now(),
     resetQuotaTime: Date.now() + 10000,
@@ -40,7 +46,10 @@ async function httpUpdateUser(req, res) {
   const { id } = req.params;
   const user = await getUserById(id);
   const updateCreds = req.body;
-  // console.log(user);
+
+  if (updateCreds.password) {
+    return res.status(400).json(errorMessage.passwordRequest);
+  }
 
   if (!user) {
     return res.status(404).json(errorMessage.userNotFound);
