@@ -15,7 +15,7 @@ async function loginUser(req, res) {
   const isValid = await verifyPassword(password, user.password);
 
   if (!isValid) {
-    return res.status(404).json(errorMessage.loginError);
+    return res.status(400).json(errorMessage.loginError);
   }
 
   const userForToken = {

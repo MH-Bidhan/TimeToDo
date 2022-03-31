@@ -1,5 +1,7 @@
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../../config");
+
 const {
-  getAllUser,
   createNewUser,
   getUserById,
   updateUser,
@@ -11,10 +13,18 @@ const { hashPassword, verifyPassword } = require("../../services/bcrypt");
 const errorMessage = require("../../services/error-messages");
 const validateUser = require("./users.validate");
 
-async function httpGetAllUser(req, res) {
-  const allUsers = await getAllUser();
+async function httpGetSpecificUser(req, res) {
+  const token = req.header("x-auth-token");
 
-  res.status(200).json(allUsers);
+  try {
+    const { id } = jwt.verify(token, JWT_SECRET);
+
+    const user = await getUserById(id);
+
+    return res.status(200).json(user);
+  } catch (err) {
+    console.log(err.message);
+  }
 }
 
 async function httpCreateNewUser(req, res) {
@@ -27,6 +37,7 @@ async function httpCreateNewUser(req, res) {
 
   const userCred = {
     ...req.body,
+    darkTheme: false,
     isGold: false,
     createdAt: Date.now(),
     resetQuotaTime: Date.now() + 10000,
@@ -38,9 +49,13 @@ async function httpCreateNewUser(req, res) {
     return res.status(400).json(error.message);
   }
 
-  const createdUser = await createNewUser(userCred);
+  try {
+    const createdUser = await createNewUser(userCred);
 
-  return res.status(201).json(createdUser);
+    return res.status(201).json(createdUser);
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 async function httpUpdateUser(req, res) {
@@ -64,6 +79,7 @@ async function httpUpdateUser(req, res) {
     remainingQuota,
     resetQuotaTime,
     createdAt,
+    avatar,
   } = user;
 
   const userUpdateCreds = {
@@ -74,6 +90,7 @@ async function httpUpdateUser(req, res) {
     remainingQuota,
     resetQuotaTime,
     createdAt,
+    avatar,
     ...updateCreds,
   };
 
@@ -130,7 +147,7 @@ async function httpChangePassword(req, res) {
 }
 
 module.exports = {
-  httpGetAllUser,
+  httpGetSpecificUser,
   httpCreateNewUser,
   httpUpdateUser,
   httpDeleteUser,

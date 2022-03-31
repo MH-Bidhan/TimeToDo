@@ -1,7 +1,7 @@
 const { hashPassword } = require("../../services/bcrypt");
 const users = require("./users.mongo");
 
-async function getAllUser() {
+async function getUser() {
   const allUsers = await users.find(
     {},
     {
@@ -74,7 +74,7 @@ async function changePassword(userId, newPassword) {
 }
 
 module.exports = {
-  getAllUser,
+  getUser,
   getUserById,
   getUserByEmail,
   createNewUser,

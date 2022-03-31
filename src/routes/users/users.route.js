@@ -4,7 +4,7 @@ const {
   checkUserSpecificAuth,
 } = require("../../services/check-auth");
 const {
-  httpGetAllUser,
+  httpGetSpecificUser,
   httpCreateNewUser,
   httpUpdateUser,
   httpDeleteUser,
@@ -13,7 +13,7 @@ const {
 
 const userRouter = express.Router();
 
-userRouter.get("/", httpGetAllUser);
+userRouter.get("/", httpGetSpecificUser);
 userRouter.post("/", httpCreateNewUser);
 userRouter.post(
   "/changePassword/:id",

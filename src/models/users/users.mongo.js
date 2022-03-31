@@ -20,6 +20,18 @@ const userSchema = new mongoose.Schema({
     max: 4096,
     required: true,
   },
+  darkTheme: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  avatar: {
+    type: String,
+    min: 3,
+    max: 255,
+    required: true,
+    default: "monkey",
+  },
   isGold: {
     type: Boolean,
     default: false,
