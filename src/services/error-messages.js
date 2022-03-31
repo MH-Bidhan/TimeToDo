@@ -4,9 +4,9 @@ const errorMessage = {
       message: "No user has been specified",
     },
   },
-  eventTimeError: {
+  taskTimeError: {
     error: {
-      message: "Event time must be in the future",
+      message: "Task time must be in the future",
     },
   },
   userNotFound: {
@@ -16,7 +16,7 @@ const errorMessage = {
   },
   missingQuota: {
     error: {
-      message: "User does not possess enough quota to create an event ",
+      message: "User does not possess enough quota to create an task ",
     },
   },
   loginError: {

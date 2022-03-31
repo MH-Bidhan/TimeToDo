@@ -1,18 +1,18 @@
 const {
-  createNewEvent,
-  getUserEvents,
-  updateEvent,
-  deleteEvent,
-} = require("../../models/events/events.model");
-const events = require("../../models/events/events.mongo");
+  createNewTask,
+  getUserTasks,
+  updateTask,
+  deleteTask,
+} = require("../../models/tasks/tasks.model");
+const tasks = require("../../models/tasks/tasks.mongo");
 const { getUserById } = require("../../models/users/users.model");
 const errorMessage = require("../../services/error-messages");
-const { checkEventStatus } = require("../../services/event-status");
+const { checkTaskStatus } = require("../../services/task-status");
 const { verifyAuthToken } = require("../../services/jwt");
-const validateEvent = require("./event.validate");
+const validateTask = require("./tasks.validate");
 
-async function httpGetAllEventsOfUser(req, res) {
-  // Sends a get request to the Server to get all events created by a specific user
+async function httpGetAllTasksOfUser(req, res) {
+  // Sends a get request to the Server to get all tasks created by a specific user
   const token = req.header("x-auth-token");
 
   const { id: userId } = verifyAuthToken(token);
@@ -21,26 +21,26 @@ async function httpGetAllEventsOfUser(req, res) {
     return res.status(400).json(errorMessage.noUserSpecified);
   }
 
-  const userEventsForCheck = await getUserEvents(userId);
+  const userTasksForCheck = await getUserTasks(userId);
 
-  await checkEventStatus(userEventsForCheck);
+  await checkTaskStatus(userTasksForCheck);
 
-  const userEvents = await getUserEvents(userId);
+  const userTasks = await getUserTasks(userId);
 
-  return res.status(200).json(userEvents);
+  return res.status(200).json(userTasks);
 }
 
-async function httpCreateNewEvent(req, res) {
+async function httpCreateNewTask(req, res) {
   const token = req.header("x-auth-token");
   const { id: userId } = verifyAuthToken(token);
-  const timeOfEvent = new Date(req.body.timeOfEvent);
+  const timeOfTask = new Date(req.body.timeOfTask);
   const currentTime = Date.now();
 
-  if (currentTime > timeOfEvent) {
-    return res.status(400).json(errorMessage.eventTimeError);
+  if (currentTime > timeOfTask) {
+    return res.status(400).json(errorMessage.taskTimeError);
   }
 
-  const newEvent = {
+  const newTask = {
     ...req.body,
     userId,
     upcoming: true,
@@ -60,27 +60,27 @@ async function httpCreateNewEvent(req, res) {
     return res.status(400).json(errorMessage.missingQuota);
   }
 
-  const { error } = validateEvent(newEvent);
+  const { error } = validateTask(newTask);
 
   if (error) {
     return res.status(400).json(error.message);
   }
 
-  const createdEvent = await createNewEvent(userId, newEvent);
+  const createdTask = await createNewTask(userId, newTask);
 
-  return res.status(201).json(createdEvent);
+  return res.status(201).json(createdTask);
 }
 
-async function httpUpdateEvent(req, res) {
+async function httpUpdateTask(req, res) {
   const token = req.header("x-auth-token");
   const { id } = verifyAuthToken(token);
 
   const updateCred = req.body;
-  const { eventId } = req.params;
+  const { taskId } = req.params;
 
-  const event = await events.findById(eventId);
+  const task = await tasks.findById(taskId);
 
-  if (!event) {
+  if (!task) {
     return res.status(404).json(errorMessage.userNotFound);
   }
 
@@ -88,23 +88,23 @@ async function httpUpdateEvent(req, res) {
     userId,
     name,
     description,
-    timeOfEvent,
+    timeOfTask,
     upcoming,
     marked,
     completed,
     archived,
     isImportant,
-  } = event;
+  } = task;
 
   if (userId !== id) {
     return res.status(404).json(errorMessage.accessDenied);
   }
 
-  const updatedEventCred = {
+  const updatedTaskCred = {
     userId,
     name,
     description,
-    timeOfEvent,
+    timeOfTask,
     upcoming,
     marked,
     completed,
@@ -113,42 +113,42 @@ async function httpUpdateEvent(req, res) {
     ...updateCred,
   };
 
-  const { error } = validateEvent(updatedEventCred);
+  const { error } = validateTask(updatedTaskCred);
 
   if (error) {
     return res.status(400).json(error.message);
   }
 
-  const updatedEvent = await updateEvent(eventId, updatedEventCred);
+  const updatedTask = await updateTask(taskId, updatedTaskCred);
 
-  return res.status(200).json(updatedEvent);
+  return res.status(200).json(updatedTask);
 }
 
-async function httpDeleteEvent(req, res) {
+async function httpDeleteTask(req, res) {
   const token = req.header("x-auth-token");
   const { id } = verifyAuthToken(token);
 
-  const { eventId } = req.params;
+  const { taskId } = req.params;
 
-  const event = await events.findById(eventId);
+  const task = await tasks.findById(taskId);
 
-  if (!event) {
+  if (!task) {
     return res.status(400).json(errorMessage.userNotFound);
   }
-  const { userId } = event;
+  const { userId } = task;
 
   if (userId !== id) {
     return res.status(404).json(errorMessage.accessDenied);
   }
 
-  const deletedEvent = await deleteEvent(eventId);
+  const deletedTask = await deleteTask(taskId);
 
-  return res.status(200).json(deletedEvent);
+  return res.status(200).json(deletedTask);
 }
 
 module.exports = {
-  httpGetAllEventsOfUser,
-  httpCreateNewEvent,
-  httpUpdateEvent,
-  httpDeleteEvent,
+  httpGetAllTasksOfUser,
+  httpCreateNewTask,
+  httpUpdateTask,
+  httpDeleteTask,
 };

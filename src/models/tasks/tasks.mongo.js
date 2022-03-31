@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const eventSchema = new mongoose.Schema({
+const taskSchema = new mongoose.Schema({
   userId: {
     type: String,
     required: true,
@@ -17,7 +17,7 @@ const eventSchema = new mongoose.Schema({
     min: 5,
     max: 510,
   },
-  timeOfEvent: {
+  timeOfTask: {
     type: Date,
     required: true,
   },
@@ -48,4 +48,4 @@ const eventSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("event", eventSchema);
+module.exports = mongoose.model("task", taskSchema);

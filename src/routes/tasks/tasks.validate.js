@@ -1,10 +1,10 @@
 const Joi = require("joi");
 
-const eventSchema = Joi.object({
+const tasksSchema = Joi.object({
   userId: Joi.string(),
   name: Joi.string().min(3).max(255).required(),
   description: Joi.string().min(3).max(255).required(),
-  timeOfEvent: Joi.date().required(),
+  timeOfTask: Joi.date().required(),
   upcoming: Joi.boolean().required().default(true),
   marked: Joi.boolean().required().default(false),
   completed: Joi.boolean().required().default(true),
@@ -12,8 +12,8 @@ const eventSchema = Joi.object({
   isImportant: Joi.boolean().required().default(false),
 });
 
-function validateEvent(event) {
-  return eventSchema.validate(event);
+function validateTask(event) {
+  return tasksSchema.validate(event);
 }
 
-module.exports = validateEvent;
+module.exports = validateTask;
