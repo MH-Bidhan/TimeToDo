@@ -8,6 +8,12 @@ async function getUserTasks(userId) {
   return allTasks;
 }
 
+async function getTaskById(id) {
+  const task = await tasks.findById(id);
+
+  return task;
+}
+
 async function createNewTask(userId, task) {
   try {
     const newTask = await tasks.create(task);
@@ -46,6 +52,7 @@ async function deleteTask(taskId) {
 
 module.exports = {
   getUserTasks,
+  getTaskById,
   createNewTask,
   updateTask,
   deleteTask,

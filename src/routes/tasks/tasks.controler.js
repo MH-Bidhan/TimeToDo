@@ -3,6 +3,7 @@ const {
   getUserTasks,
   updateTask,
   deleteTask,
+  getTaskById,
 } = require("../../models/tasks/tasks.model");
 const tasks = require("../../models/tasks/tasks.mongo");
 const { getUserById } = require("../../models/users/users.model");
@@ -28,6 +29,21 @@ async function httpGetAllTasksOfUser(req, res) {
   const userTasks = await getUserTasks(userId);
 
   return res.status(200).json(userTasks);
+}
+
+async function httpGetTaskById(req, res) {
+  const { id } = req.params;
+  const token = req.header("x-auth-token");
+
+  const { id: userId } = verifyAuthToken(token);
+
+  const task = await getTaskById(id);
+
+  if (task.userId !== userId) {
+    return res.status(403).json(errorMessage.accessDenied);
+  }
+
+  return res.status(200).json(task);
 }
 
 async function httpCreateNewTask(req, res) {
@@ -148,6 +164,7 @@ async function httpDeleteTask(req, res) {
 
 module.exports = {
   httpGetAllTasksOfUser,
+  httpGetTaskById,
   httpCreateNewTask,
   httpUpdateTask,
   httpDeleteTask,

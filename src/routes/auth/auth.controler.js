@@ -2,6 +2,7 @@ const { getUserByEmail } = require("../../models/users/users.model");
 const { verifyPassword } = require("../../services/bcrypt");
 const errorMessage = require("../../services/error-messages");
 const { getAuthToken } = require("../../services/jwt");
+const checkUserStatus = require("../../services/user-status");
 
 async function loginUser(req, res) {
   const { email, password } = req.body;
@@ -17,6 +18,8 @@ async function loginUser(req, res) {
   if (!isValid) {
     return res.status(400).json(errorMessage.loginError);
   }
+
+  await checkUserStatus(user);
 
   const userForToken = {
     id: user["_id"],
