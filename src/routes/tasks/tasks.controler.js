@@ -39,6 +39,10 @@ async function httpGetTaskById(req, res) {
 
   const task = await getTaskById(id);
 
+  if (!task) {
+    return res.status(404).json(errorMessage.taskNotFound);
+  }
+
   if (task.userId !== userId) {
     return res.status(403).json(errorMessage.accessDenied);
   }
@@ -97,7 +101,7 @@ async function httpUpdateTask(req, res) {
   const task = await tasks.findById(taskId);
 
   if (!task) {
-    return res.status(404).json(errorMessage.userNotFound);
+    return res.status(404).json(errorMessage.taskNotFound);
   }
 
   const {
@@ -113,7 +117,7 @@ async function httpUpdateTask(req, res) {
   } = task;
 
   if (userId !== id) {
-    return res.status(404).json(errorMessage.accessDenied);
+    return res.status(403).json(errorMessage.accessDenied);
   }
 
   const updatedTaskCred = {
@@ -149,12 +153,12 @@ async function httpDeleteTask(req, res) {
   const task = await tasks.findById(taskId);
 
   if (!task) {
-    return res.status(400).json(errorMessage.userNotFound);
+    return res.status(404).json(errorMessage.userNotFound);
   }
   const { userId } = task;
 
   if (userId !== id) {
-    return res.status(404).json(errorMessage.accessDenied);
+    return res.status(403).json(errorMessage.accessDenied);
   }
 
   const deletedTask = await deleteTask(taskId);

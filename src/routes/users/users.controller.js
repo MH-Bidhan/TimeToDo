@@ -9,7 +9,7 @@ const {
   getUserByEmail,
   changePassword,
 } = require("../../models/users/users.model");
-const { hashPassword, verifyPassword } = require("../../services/bcrypt");
+const { verifyPassword } = require("../../services/bcrypt");
 const errorMessage = require("../../services/error-messages");
 const validateUser = require("./users.validate");
 
@@ -80,6 +80,8 @@ async function httpUpdateUser(req, res) {
     resetQuotaTime,
     createdAt,
     avatar,
+
+    darkTheme,
   } = user;
 
   const userUpdateCreds = {
@@ -91,6 +93,7 @@ async function httpUpdateUser(req, res) {
     resetQuotaTime,
     createdAt,
     avatar,
+    darkTheme,
     ...updateCreds,
   };
 

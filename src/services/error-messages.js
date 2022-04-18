@@ -1,4 +1,9 @@
 const errorMessage = {
+  taskNotFound: {
+    error: {
+      message: "No task found with the given id",
+    },
+  },
   noUserSpecified: {
     error: {
       message: "No user has been specified",

@@ -13,7 +13,7 @@ const {
 
 const userRouter = express.Router();
 
-userRouter.get("/", httpGetSpecificUser);
+userRouter.get("/", checkAuth, checkUserSpecificAuth, httpGetSpecificUser);
 userRouter.post("/", httpCreateNewUser);
 userRouter.post(
   "/changePassword/:id",
