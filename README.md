@@ -4,7 +4,7 @@ This is the server side ( Backend ) of my personal project TimeToDo. An user can
 
 ## Live-Site
 
-Visit live site on : [https://timetodoclient.herokuapp.com/](https://timetodoclient.herokuapp.com/)
+Visit live site on : [timetodoapp.netlify.app/](https://timetodoapp.netlify.app/)
 
 ## About This App
 
